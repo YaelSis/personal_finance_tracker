@@ -43,3 +43,83 @@ def show_top_spending_category(df):
     print("\n--- Top Spending Category (Expenses Only) ---")
     print(f"{top_category} with {top_amount:.2f} total spending.")
 
+#============
+#=========================RENE=======================================
+
+# analysis.py - Personal Finance Tracker Visualization Module
+import pandas as pd
+import matplotlib.pyplot as plt
+
+
+class FinanceVisualizer:
+    def __init__(self, data_path='sampledata.csv'):
+        """Initialize the visualizer with transaction data from CSV file
+
+        Args:
+            data_path (str): Path to the CSV file containing transaction data
+                            Expected columns: Date, Category, Amount, Type
+        """
+        self.df = pd.read_csv(data_path)
+        self.df['Date'] = pd.to_datetime(self.df['Date'])  # Convert string to datetime
+
+    def show_monthly_expenses(self):
+        """Display line chart of monthly expense trends (Expenses only)"""
+        expenses = self.df[self.df['Type'] == 'Expense'].copy()
+        monthly = expenses.groupby(expenses['Date'].dt.to_period('M'))['Amount'].sum()
+
+        plt.figure(figsize=(10, 5))
+        monthly.plot(
+            kind='line',
+            title='Monthly Expenses Trend',
+            marker='o',
+            color='teal',
+            linewidth=2
+        )
+        plt.ylabel('Amount ($)')
+        plt.xlabel('Month')
+        plt.grid(True, linestyle='--', alpha=0.7)
+        plt.show()
+
+    def show_spending_by_category(self):
+        """Display horizontal bar chart of spending by category (Expenses only)"""
+        expenses = self.df[self.df['Type'] == 'Expense'].copy()
+        category_spending = expenses.groupby('Category')['Amount'].sum().sort_values()
+
+        plt.figure(figsize=(10, 5))
+        category_spending.plot(
+            kind='barh',
+            title='Spending by Category',
+            color='skyblue',
+            edgecolor='black'
+        )
+        plt.xlabel('Amount ($)')
+        plt.tight_layout()
+        plt.show()
+
+    def show_spending_distribution(self):
+        """Display pie chart of spending distribution (Expenses only)"""
+        expenses = self.df[self.df['Type'] == 'Expense'].copy()
+        category_spending = expenses.groupby('Category')['Amount'].sum()
+
+        plt.figure(figsize=(8, 8))
+        category_spending.plot(
+            kind='pie',
+            title='Spending Distribution',
+            autopct='%1.1f%%',
+            startangle=90,
+            shadow=True,
+            colormap='Pastel2'
+        )
+        plt.ylabel('')
+        plt.show()
+
+
+# --- MAIN EXECUTION ---
+if __name__ == "__main__":
+    print("✅ Loading transaction data from sampledata.csv...")
+    visualizer = FinanceVisualizer()  # Uses default CSV path
+    visualizer.show_monthly_expenses()
+    visualizer.show_spending_by_category()
+    visualizer.show_spending_distribution()
+
+
